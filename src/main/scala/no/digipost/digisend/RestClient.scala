@@ -36,7 +36,7 @@ trait RestClient {
       case (brevId, r) => {
         val brevXml: Node = (xml \\ "dokument").find(n => (n \\ "id").text == brevId).get
         val Brev(fil, emne) = brevXml
-        val SmsVarsling(tidspunkter, etterTimer) = brevXml
+        val Smsvarsling(tidspunkter, etterTimer) = brevXml
         (fil, message((math.random * 100000).toString, emne, r,
           new SmsNotification(tidspunkter.map(new ListedTime(_)).asJava, etterTimer.map(new Integer(_)).asJava)))
       }

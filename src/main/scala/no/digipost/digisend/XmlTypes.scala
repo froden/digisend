@@ -35,19 +35,6 @@ object XmlTypes {
     }
   }
 
-  object SmsVarsling {
-    def unapply(brevXml: NodeSeq): Option[(Seq[DateTime], Seq[Int])] = {
-      val smsVarslingXml = brevXml \\ "sms-varsling"
-      if (smsVarslingXml.isEmpty) {
-        None
-      } else {
-        val tidspunkter = (smsVarslingXml \\ "tidspunkt").map(sms => new DateTime(sms.text))
-        val etterTimer = (smsVarslingXml \\ "etter-timer").map(_.text.toInt)
-        Some(tidspunkter, etterTimer)
-      }
-    }
-  }
-
   object FulltNavnFornavnForst {
     def apply(navn: String) =
       <navn>
@@ -67,7 +54,15 @@ object XmlTypes {
   }
 
   object Adresse {
-    def apply(gate: String, postnummer: String, poststed: String): NodeSeq = adresse(gate, postnummer, poststed)
+    def apply(gate: String, postnummer: String, poststed: String) = {
+      <adresse>
+        <adresse-format1>
+          <adresselinje1>{gate}</adresselinje1>
+          <postnummer>{postnummer}</postnummer>
+          <poststed>{poststed}</poststed>
+        </adresse-format1>
+      </adresse>
+    }
 
     def unapply(adrXml: NodeSeq): Option[(String, String, String)] = {
       val adresseformat1 = adrXml \\ "adresse-format1"
@@ -105,36 +100,53 @@ object XmlTypes {
     }
   }
 
-  def masseutsendelse(jobbinnstillinger: NodeSeq, dokumenter: Seq[Node], forsendelser: Seq[Node]) = {
-    <masseutsendelse xmlns="http://www.digipost.no/xsd/avsender1_9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      {jobbinnstillinger}
-      <standard-distribusjon>
-        <post>
-          {dokumenter}
-        </post>
-        <forsendelser>
-          {forsendelser}
-        </forsendelser>
-      </standard-distribusjon>
-    </masseutsendelse>
+  object Masseutsendelse {
+    def apply(jobbinnstillinger: NodeSeq, dokumenter: Seq[Node], forsendelser: Seq[Node]) = {
+      <masseutsendelse xmlns="http://www.digipost.no/xsd/avsender1_9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        {jobbinnstillinger}
+        <standard-distribusjon>
+          <post>
+            {dokumenter}
+          </post>
+          <forsendelser>
+            {forsendelser}
+          </forsendelser>
+        </standard-distribusjon>
+      </masseutsendelse>
+    }
   }
 
-  def jobbinstillinger(senderId: String, jobbnavn: String) = {
-    <jobb-innstillinger>
-      <avsender-id>{senderId}</avsender-id>
-      <jobb-id>jobbid{(math.random * 100000).toInt}</jobb-id>
-      <jobb-navn>{jobbnavn}</jobb-navn>
-      <auto-godkjenn-jobb>false</auto-godkjenn-jobb>
-    </jobb-innstillinger>
+  object Jobbinstillinger {
+    def apply(senderId: String, jobbnavn: String) = {
+      <jobb-innstillinger>
+        <avsender-id>{senderId}</avsender-id>
+        <jobb-id>jobbid{(math.random * 100000).toInt}</jobb-id>
+        <jobb-navn>{jobbnavn}</jobb-navn>
+        <auto-godkjenn-jobb>false</auto-godkjenn-jobb>
+      </jobb-innstillinger>
+    }
   }
 
-  def smsVarsling(dates: Seq[DateTime], etterTimer: Seq[Int]) = {
-    val varslinger = dates.map(d => <tidspunkt>{d.toString()}</tidspunkt>)
-    val etterTimerVarslinger = etterTimer.map(t => <etter-timer>{t}</etter-timer>)
-    <sms-varsling>
-      {varslinger}
-      {etterTimerVarslinger}
-    </sms-varsling>
+  object Smsvarsling {
+    def apply(dates: Seq[DateTime], etterTimer: Seq[Int]) = {
+      val varslinger = dates.map(d => <tidspunkt>{d.toString()}</tidspunkt>)
+      val etterTimerVarslinger = etterTimer.map(t => <etter-timer>{t}</etter-timer>)
+      <sms-varsling>
+        {varslinger}
+        {etterTimerVarslinger}
+      </sms-varsling>
+    }
+
+    def unapply(brevXml: NodeSeq): Option[(Seq[DateTime], Seq[Int])] = {
+      val smsVarslingXml = brevXml \\ "sms-varsling"
+      if (smsVarslingXml.isEmpty) {
+        None
+      } else {
+        val tidspunkter = (smsVarslingXml \\ "tidspunkt").map(sms => new DateTime(sms.text))
+        val etterTimer = (smsVarslingXml \\ "etter-timer").map(_.text.toInt)
+        Some(tidspunkter, etterTimer)
+      }
+    }
   }
 
   def print(adresse: NodeSeq, returadresse: NodeSeq) = {
@@ -170,28 +182,5 @@ object XmlTypes {
       {mottaker}
       {print}
     </forsendelse>
-  }
-
-
-  def mottaker(navn: String, adresse: NodeSeq) = {
-    <mottaker>
-      <kunde-id>{navn}</kunde-id>
-      <navn>
-        <navn-format1>
-          <fullt-navn-fornavn-foerst>{navn}</fullt-navn-fornavn-foerst>
-        </navn-format1>
-      </navn>
-      {adresse}
-    </mottaker>
-  }
-
-  def adresse(gate: String, postnummer: String, poststed: String) = {
-    <adresse>
-      <adresse-format1>
-        <adresselinje1>{gate}</adresselinje1>
-        <postnummer>{postnummer}</postnummer>
-        <poststed>{poststed}</poststed>
-      </adresse-format1>
-    </adresse>
   }
 }
