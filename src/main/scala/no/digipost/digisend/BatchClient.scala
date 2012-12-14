@@ -21,10 +21,9 @@ trait BatchClient {
     dataOut.toByteArray
   }
 
-  def sftpUpload(senderId: String, filename: String, fileData: Array[Byte]) {
-    SSH.ftp(host = "sftp.digipost.no", username = "qa_" + senderId, passphrase = "passord") {
-      ftp =>
-        ftp.putBytes(fileData, "/masseutsendelse/" + filename)
+  def sftpUpload(senderId: String, filename: String, fileData: Array[Byte], passphrase:String = null, host: String = "sftp.digipost.no") {
+    SSH.ftp(host = host, username = "qa_" + senderId, passphrase = passphrase) {
+      ftp => ftp.putBytes(fileData, "/masseutsendelse/" + filename)
     }
   }
 }

@@ -6,13 +6,13 @@ import java.lang.Integer
 import collection.JavaConverters._
 import XmlTypes._
 import no.digipost.api.client.DigipostClient
+import Util._
 
 trait RestClient {
-  def sendRestApi(senderId:String, messages: Seq[(String, Message)]) {
-    val c = client(senderId.toInt, "certificate.p12", logging = true, host = "https://qa.api.digipost.no")
+  def sendRestApi(client: DigipostClient)(messages: Seq[(String, Message)]) {
     messages.foreach {
       case (filename, msg) => try {
-        c.sendMessage(msg, fileAsStream(filename))
+        client.sendMessage(msg, fileAsStream(filename))
       } catch {
         case ex: Throwable => println(ex)
       }
@@ -43,15 +43,13 @@ trait RestClient {
     }
   }
 
-  def client(senderId: Int, certificate: String, certificatePassword: String = "Qwer1234", logging: Boolean = false,
+  def client(senderId: Int, certificate: String, certificatePassword: String = "Qwer1234!", logging: Boolean = false,
              host: String = "https://qa.api.digipost.no") = {
     val certificateStream = fileAsStream(certificate)
     val client = new DigipostClient(host, senderId, certificateStream, certificatePassword)
     if (logging) client.addFilter(new TestLoggingFilter())
     client
   }
-
-  def fileAsStream(filename: String) = getClass.getClassLoader.getResourceAsStream(filename)
 
   def printRecipient(name: String, address: String, postalCode: String, city: String) = new PrintRecipient(name, new NorwegianAddress(address, postalCode, city))
 
