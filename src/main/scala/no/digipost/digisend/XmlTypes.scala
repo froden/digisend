@@ -89,11 +89,13 @@ object XmlTypes {
       </dokument>
     }
 
-    def unapply(docXml: NodeSeq): Option[(String, String)] = {
+    def unapply(docXml: NodeSeq): Option[(String, String, String, NodeSeq)] = {
       if (docXml.toString().contains("""type="brev"""")) {
+        val id = (docXml \\ "id").text
         val fil = (docXml \\ "fil").text
         val emne = (docXml \\ "emne").text
-        Some(fil, emne)
+        val sms = (docXml \\ "sms-varsling")
+        Some(id, fil, emne, sms)
       } else {
         None
       }
@@ -117,13 +119,26 @@ object XmlTypes {
   }
 
   object Jobbinstillinger {
-    def apply(senderId: String, jobbnavn: String) = {
+    def apply(avsenderId: String, jobbId: String, jobbnavn: String, autogodkjenn: Boolean = false) = {
       <jobb-innstillinger>
-        <avsender-id>{senderId}</avsender-id>
-        <jobb-id>jobbid{(math.random * 100000).toInt}</jobb-id>
+        <avsender-id>{avsenderId}</avsender-id>
+        <jobb-id>{jobbId}</jobb-id>
         <jobb-navn>{jobbnavn}</jobb-navn>
-        <auto-godkjenn-jobb>false</auto-godkjenn-jobb>
+        <auto-godkjenn-jobb>{autogodkjenn}</auto-godkjenn-jobb>
       </jobb-innstillinger>
+    }
+
+    def unapply(instillingerXml: NodeSeq): Option[(String, String, String, Boolean)] = {
+      val i = instillingerXml \\ "jobb-innstillinger"
+      if (i.isEmpty) {
+        None
+      } else {
+        val avsenderID = (i \\ "avsender-id").text
+        val jobbId = (i \\ "jobb-id").text
+        val jobbnavn = (i \\ "jobb-navn").text
+        val autogodkjenn = (i \\ "auto-godkjenn-jobb").text.toBoolean
+        Some(avsenderID, jobbId, jobbnavn, autogodkjenn)
+      }
     }
   }
 
@@ -177,12 +192,25 @@ object XmlTypes {
   }
 
   object Forsendelse {
-    def apply(brevId: String, mottaker: NodeSeq, print: NodeSeq) = {
+    def apply(brevId: String, mottaker: NodeSeq, print: NodeSeq): Node = {
       <forsendelse>
         <brev>{brevId}</brev>
         {mottaker}
         {print}
       </forsendelse>
+    }
+    def apply(brevId: String, mottaker: NodeSeq): Node = apply(brevId, mottaker, null)
+
+    def unapply(forsendelseXml: NodeSeq): Option[(String, NodeSeq, NodeSeq)] = {
+      val f = forsendelseXml \\ "forsendelse"
+      if (f.isEmpty) {
+        None
+      } else {
+        val brevId = (f \\ "brev").text
+        val mottaker = (f \\ "mottaker")
+        val print = (f \\ "fysisk-print")
+        Some(brevId, mottaker, print)
+      }
     }
   }
 }

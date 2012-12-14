@@ -33,12 +33,15 @@ trait RestClient {
     }
 
     recipients.map {
-      case (brevId, r) => {
+      case (brevId, mottaker) => {
         val brevXml: Node = (xml \\ "dokument").find(n => (n \\ "id").text == brevId).get
-        val Brev(fil, emne) = brevXml
-        val Smsvarsling(tidspunkter, etterTimer) = brevXml
-        (fil, message((math.random * 100000).toString, emne, r,
-          new SmsNotification(tidspunkter.map(new ListedTime(_)).asJava, etterTimer.map(new Integer(_)).asJava)))
+        val Brev(id, fil, emne, _) = brevXml
+        val smsvarsling = brevXml match {
+          case Smsvarsling(tidspunkter, etterTimer) =>
+            new SmsNotification(tidspunkter.map(new ListedTime(_)).asJava, etterTimer.map(new Integer(_)).asJava)
+          case _ => new SmsNotification()
+        }
+        (fil, message((math.random * 100000).toString, emne, mottaker, smsvarsling))
       }
     }
   }

@@ -11,6 +11,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "fr.janalyse" %% "janalyse-ssh" % "0.9.5-b3",
+  "org.scalatest" %% "scalatest" % "1.8" % "test",
   "no.digipost" % "digipost-api-client-java" % "2.1-SNAPSHOT",
   "com.sun.jersey" % "jersey-core" % "1.12"
 )
