@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 
 import XmlTypes._
 
-object PrintBatchTest extends App with BatchClient with RestClient {
+object BatchRestTest extends App with BatchClient with RestClient {
   val senderId = "179074"
   val filename1 = "ikke-gyldig-for-print-mange-sider.pdf"
   val filename2 = "rema.pdf"
@@ -26,6 +26,6 @@ object PrintBatchTest extends App with BatchClient with RestClient {
   val zipArchive = zip(xml, Map(filename1 -> fileContent1, filename2 -> fileContent2))
 //  FileUtils.writeByteArrayToFile(new File("/Users/frode/digipost/home/ftp/test_4/jail/masseutsendelse/masseutsendelse.zip"), zipArchive)
 
-  sftpUpload(senderId, "sending.zip", zipArchive)
+//  sftpUpload(senderId, "sending.zip", zipArchive)
   sendRestApi(senderId, xmlToMessages(xml))
 }
