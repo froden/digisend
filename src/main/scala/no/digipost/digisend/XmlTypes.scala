@@ -176,11 +176,13 @@ object XmlTypes {
       <poststed>{poststed}</poststed>
   }
 
-  def forsendelse(brevId: String, mottaker: NodeSeq, print: NodeSeq) = {
-    <forsendelse>
-      <brev>{brevId}</brev>
-      {mottaker}
-      {print}
-    </forsendelse>
+  object Forsendelse {
+    def apply(brevId: String, mottaker: NodeSeq, print: NodeSeq) = {
+      <forsendelse>
+        <brev>{brevId}</brev>
+        {mottaker}
+        {print}
+      </forsendelse>
+    }
   }
 }
