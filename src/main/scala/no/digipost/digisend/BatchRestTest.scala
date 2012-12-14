@@ -16,8 +16,8 @@ object BatchRestTest extends App with BatchClient with RestClient {
   val xml = masseutsendelse(
     jobbinstillinger(senderId, "Jubajubajobb"),
     Seq (
-      brev("pdf1", filename1, "Brev til deg", smsVarsling(Seq(new DateTime(2012, 12, 24, 10, 0)), Seq(2, 4))),
-      brev("pdf2", filename2, "Annet brev til deg", smsVarsling(Seq(new DateTime(2012, 12, 24, 10, 0)), Seq(2, 4)))
+      Brev("pdf1", filename1, "Brev til deg", smsVarsling(Seq(new DateTime(2012, 12, 24, 10, 0)), Seq(2, 4))),
+      Brev("pdf2", filename2, "Annet brev til deg", smsVarsling(Seq(new DateTime(2012, 12, 24, 10, 0)), Seq(2, 4)))
     ),
     Seq(
       forsendelse("pdf1", NavnOgAdresse(FulltNavnFornavnForst("Øyvind Nerbråten"), Adresse("Maridalsvn 231C", "0467", "Oslo")), null),
@@ -30,7 +30,7 @@ object BatchRestTest extends App with BatchClient with RestClient {
   //lag massutsendelse
   val zipArchive = zip(xml, Map(filename1 -> fileContent1, filename2 -> fileContent2))
 
-  sftpUpload(senderId, "sending.zip", zipArchive, passphrase = "passord")
+  sftpUpload(senderId, "sending.zip", zipArchive, passphrase = "teste")
 
   val c = client(senderId.toInt, "certificate.p12", logging = true, host = "https://qa.api.digipost.no")
   sendRestApi(c)(xmlToMessages(xml))

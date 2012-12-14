@@ -66,14 +66,6 @@ object XmlTypes {
     }
   }
 
-  object Dokument {
-    def unapply(docXml: NodeSeq): Option[(String, String)] = {
-      val fil = (docXml \\ "fil").text
-      val emne = (docXml \\ "emne").text
-      Some(fil, emne)
-    }
-  }
-
   object Adresse {
     def apply(gate: String, postnummer: String, poststed: String): NodeSeq = adresse(gate, postnummer, poststed)
 
@@ -86,6 +78,29 @@ object XmlTypes {
         val postnummer = (adresseformat1 \\ "postnummer").text
         val poststed = (adresseformat1 \\ "poststed").text
         Some(adresse, postnummer, poststed)
+      }
+    }
+  }
+
+  object Brev {
+    def apply(id: String, filename: String, emne: String, smsVarsling: NodeSeq) = {
+      <dokument xsi:type="brev">
+        <id>{id}</id>
+        <fil>{filename}</fil>
+        <innstillinger>
+          <emne>{emne}</emne>
+          {smsVarsling}
+        </innstillinger>
+      </dokument>
+    }
+
+    def unapply(docXml: NodeSeq): Option[(String, String)] = {
+      if (docXml.toString().contains("""type="brev"""")) {
+        val fil = (docXml \\ "fil").text
+        val emne = (docXml \\ "emne").text
+        Some(fil, emne)
+      } else {
+        None
       }
     }
   }
@@ -111,17 +126,6 @@ object XmlTypes {
       <jobb-navn>{jobbnavn}</jobb-navn>
       <auto-godkjenn-jobb>false</auto-godkjenn-jobb>
     </jobb-innstillinger>
-  }
-
-  def brev(id: String, filename: String, emne: String, smsVarsling: NodeSeq) = {
-    <dokument xsi:type="brev">
-      <id>{id}</id>
-      <fil>{filename}</fil>
-      <innstillinger>
-        <emne>{emne}</emne>
-        {smsVarsling}
-      </innstillinger>
-    </dokument>
   }
 
   def smsVarsling(dates: Seq[DateTime], etterTimer: Seq[Int]) = {

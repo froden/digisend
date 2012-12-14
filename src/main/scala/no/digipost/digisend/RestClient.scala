@@ -24,18 +24,18 @@ trait RestClient {
     val recipients = forsendelser.map { f =>
       val brevId = (f \\ "brev").text
 
-      val recipient = (f \\ "mottaker") match {
+      val mottaker = (f \\ "mottaker") match {
         case NavnOgAdresse(FulltNavnFornavnForst(navn), Adresse(adresse, postnummer, poststed)) =>
           new RecipientIdentification(new NameAndAddress(navn, adresse, null, postnummer, poststed))
         case Digipostadresse(d) => new RecipientIdentification(new DigipostAddress(d))
       }
-      (brevId, recipient)
+      (brevId, mottaker)
     }
 
     recipients.map {
       case (brevId, r) => {
         val brevXml: Node = (xml \\ "dokument").find(n => (n \\ "id").text == brevId).get
-        val Dokument(fil, emne) = brevXml
+        val Brev(fil, emne) = brevXml
         val SmsVarsling(tidspunkter, etterTimer) = brevXml
         (fil, message((math.random * 100000).toString, emne, r,
           new SmsNotification(tidspunkter.map(new ListedTime(_)).asJava, etterTimer.map(new Integer(_)).asJava)))
