@@ -5,6 +5,7 @@ import org.joda.time.DateTime
 import XmlTypes._
 import Util._
 import xml.PrettyPrinter
+import util.Random
 
 object BatchRestTest extends App with BatchClient with RestClient {
   val senderId = "6"
@@ -14,15 +15,15 @@ object BatchRestTest extends App with BatchClient with RestClient {
   val fileContent2 = fileAsBytes(filename2)
 
   val xml = Masseutsendelse(
-    Jobbinstillinger(senderId, (math.random * 10000).toString, "Jubajubajobb", autogodkjenn = true),
+    Jobbinstillinger(senderId, Random.nextString(4), "Frodes jobb " + Random.nextInt(), autogodkjenn = true),
     Seq (
       Brev("pdf1", filename1, "Brev til deg", Smsvarsling(Seq(new DateTime(2012, 12, 24, 10, 0)), Seq(2, 4))),
       Brev("pdf2", filename2, "Annet brev til deg", null)
     ),
     Seq(
-      Forsendelse("pdf1", NavnOgAdresse(FulltNavnFornavnForst("Øyvind Nerbråten"), Adresse("Maridalsvn 231C", "0467", "Oslo")), null),
-      Forsendelse("pdf2", Digipostadresse("frode.nerbråten#0000"), null),
-      Forsendelse("pdf2", Digipostadresse("frode.nerbraaten#0000"))
+      Forsendelse("pdf1", NavnOgAdresse(FulltNavnFornavnForst("Frode Nerbråten"), Adresse("Testveien", "1002", "Oslo")), null),
+      Forsendelse("pdf2", Digipostadresse("frode.nerbråten#1234"), null),
+      Forsendelse("pdf2", Digipostadresse("frode.nerbraaten#1234"))
     ))
 
   //debug
