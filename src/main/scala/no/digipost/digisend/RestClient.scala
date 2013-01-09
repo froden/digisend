@@ -39,6 +39,7 @@ trait RestClient {
         val smsvarsling = brevXml match {
           case Smsvarsling(tidspunkter, etterTimer) =>
             new SmsNotification(tidspunkter.map(new ListedTime(_)).asJava, etterTimer.map(new Integer(_)).asJava)
+          case Smsvarsling18(true) => new SmsNotification(0)
           case _ => new SmsNotification()
         }
         (fil, message((math.random * 100000).toString, emne, mottaker, smsvarsling))

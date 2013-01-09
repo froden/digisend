@@ -36,4 +36,10 @@ class XmlTypesTest extends FunSuite {
       case Jobbinstillinger("avsenderId", "jobbId", "jobbnavn", true) => ()
     }
   }
+
+  test("SmsVarsling 1.8 skal kunne lage og lese xml") {
+    Smsvarsling18(true) match {
+      case Smsvarsling18(true) => ()
+    }
+  }
 }

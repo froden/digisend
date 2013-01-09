@@ -2,6 +2,7 @@ package no.digipost.digisend
 
 import xml.{Node, NodeSeq}
 import org.joda.time.DateTime
+import util.control.Exception.allCatch
 
 object XmlTypes {
 
@@ -103,8 +104,9 @@ object XmlTypes {
   }
 
   object Masseutsendelse {
-    def apply(jobbinnstillinger: NodeSeq, dokumenter: Seq[Node], forsendelser: Seq[Node]) = {
-      <masseutsendelse xmlns="http://www.digipost.no/xsd/avsender1_9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    def apply(jobbinnstillinger: NodeSeq, dokumenter: Seq[Node], forsendelser: Seq[Node], version: String = "1_9") = {
+      val namespace = "http://www.digipost.no/xsd/avsender" + version
+      <masseutsendelse xmlns={namespace} xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         {jobbinnstillinger}
         <standard-distribusjon>
           <post>
@@ -142,8 +144,16 @@ object XmlTypes {
     }
   }
 
+  object Smsvarsling18 {
+    def apply(smsVarsling: Boolean) = <sms-varsling>{smsVarsling}</sms-varsling>
+
+    def unapply(brevXml: NodeSeq): Option[Boolean] = allCatch.opt((brevXml \\ "sms-varsling").text.toBoolean)
+  }
+
   object Smsvarsling {
-    def apply(dates: Seq[DateTime], etterTimer: Seq[Int]) = {
+    def apply(): NodeSeq = <sms-varsling />
+
+    def apply(dates: Seq[DateTime], etterTimer: Seq[Int]): NodeSeq = {
       val varslinger = dates.map(d => <tidspunkt>{d.toString()}</tidspunkt>)
       val etterTimerVarslinger = etterTimer.map(t => <etter-timer>{t}</etter-timer>)
       <sms-varsling>
